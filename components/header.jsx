@@ -42,11 +42,12 @@ const Header = () => {
               size="sm"
               onClick={() => setShowUpgradeModal(true)}
             >
+              </Button>
               <Button className={"mr-2"} variant="ghost" size="sm" asChild>
-                <Link href="/explore">Explore</Link>
+               
               </Button>{" "}
               <Link href="/explore">Explore</Link>
-            </Button>
+            
             <Authenticated>
               <Button size="sm" asChild className="flex gap-2 mr-4">
                 <Link href="/create-event">

@@ -55,6 +55,7 @@ export default defineSchema({
     address: v.optional(v.string()),
     city: v.string(),
     state: v.optional(v.string()),
+    country:v.string(),
 
     // Capacity and Ticketing
     capacity: v.number(),
@@ -96,7 +97,7 @@ export default defineSchema({
 
     registeredAt: v.number(),
   })
-    .index("by_event", ["event_id"])
+    .index("by_event", ["eventId"])
     .index("by_user", ["userId"])
     .index("by_event_user", ["eventId", "userId"])
     .index("by_qr_code", ["qrCode"]),
