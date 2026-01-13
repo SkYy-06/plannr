@@ -35,19 +35,20 @@ const Header = () => {
           {/* Right Side Actions */}
 
           <div className="flex items-center">
-            {/* Create Event */}
+            {/* Show Pro badge or Upgrade button */}
 
             <Button
-              variant={"ghost"}
+              variant="ghost"
               size="sm"
               onClick={() => setShowUpgradeModal(true)}
             >
-              </Button>
-              <Button className={"mr-2"} variant="ghost" size="sm" asChild>
-               
-              </Button>{" "}
+              Pricing
+            </Button>
+
+            <Button variant="ghost" size="sm" asChild className={"mr-2"}>
               <Link href="/explore">Explore</Link>
-            
+            </Button>
+
             <Authenticated>
               <Button size="sm" asChild className="flex gap-2 mr-4">
                 <Link href="/create-event">

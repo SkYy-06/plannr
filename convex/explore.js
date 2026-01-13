@@ -30,23 +30,24 @@ export const getEventsByLocation = query({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
+
     let events = await ctx.db
       .query("events")
       .withIndex("by_start_date")
       .filter((q) => q.gte(q.field("startDate"), now))
       .collect();
 
-    // Filters by city or state
-
+    // Filter by city or state
     if (args.city) {
       events = events.filter(
         (e) => e.city.toLowerCase() === args.city.toLowerCase()
       );
     } else if (args.state) {
       events = events.filter(
-        (e) => e.state.toLowerCase() === args.state.toLowerCase()
+        (e) => e.state?.toLowerCase() === args.state.toLowerCase()
       );
     }
+
     return events.slice(0, args.limit ?? 4);
   },
 });
