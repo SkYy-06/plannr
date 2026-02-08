@@ -1,4 +1,6 @@
+import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 
 export const store = mutation({
   args: {},
@@ -17,7 +19,7 @@ export const store = mutation({
     const user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) =>
-        q.eq("tokenIdentifier", identity.tokenIdentifier)
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
       )
       .unique();
     if (user !== null) {
@@ -38,8 +40,8 @@ export const store = mutation({
       imageUrl: identity.pictureUrl,
       hasCompleteOnboarding: false,
       freeEventsCreated: 0,
-      createdAt : Date.now(),
-      updatedAt : Date.now()
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     });
   },
 });
@@ -53,13 +55,36 @@ export const getCurrentUser = query({
     const user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) =>
-        q.eq("tokenIdentifier", identity.tokenIdentifier)
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
       )
       .unique();
 
-      if(!user){
-        throw new Error("User not found");
-      }
-      return user
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return user;
+  },
+});
+
+export const completeOnboarding = mutation({
+  args: {
+    location: v.object({
+      city: v.string(),
+      state: v.optional(v.string()),
+      country: v.string(),
+    }),
+    interests: v.array(v.string()), // Minimum 3 Categories
+  },
+  handler: async (ctx, args) => {
+    const user = await ctx.runQuery(internal.users.getCurrentUser);
+
+    await ctx.db.patch(user._id, {
+      location: args.location,
+      interests: args.interests,
+      hasCompleteOnboarding: true,
+      updatedAt: Date.now(),
+    });
+
+    return user._id
   },
 });

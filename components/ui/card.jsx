@@ -2,10 +2,7 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-function Card({
-  className,
-  ...props
-}) {
+function Card({ className, ...props }) {
   return (
     <div
       data-slot="card"
@@ -13,9 +10,11 @@ function Card({
         "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
         className
       )}
-      {...props} />
+      {...props}
+    />
   );
 }
+
 
 function CardHeader({
   className,

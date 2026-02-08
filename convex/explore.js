@@ -52,6 +52,7 @@ export const getEventsByLocation = query({
   },
 });
 
+// Get popular events (high registration count)
 export const getPopularEvents = query({
   args: {
     limit: v.optional(v.number()),
@@ -64,6 +65,8 @@ export const getPopularEvents = query({
       .filter((q) => q.gte(q.field("startDate"), now))
       .collect();
 
+
+      // Sort by registration count
     const popular = events
       .sort((a, b) => b.registrationCount - a.registrationCount)
       .slice(0, args.limit ?? 6);
@@ -71,10 +74,12 @@ export const getPopularEvents = query({
   },
 });
 
+
+// Get events by category with pagination
 export const getEventsByCategory = query({
   args: {
     category: v.string(),
-    limit: v.optional(v.string()),
+    limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -88,6 +93,8 @@ export const getEventsByCategory = query({
   },
 });
 
+
+// Get events counts by category
 export const getCategoryCount = query({
   handler: async (ctx) => {
     const now = Date.now();

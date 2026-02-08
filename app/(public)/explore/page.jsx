@@ -18,21 +18,28 @@ import { useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Loader2, MapPin, Users } from "lucide-react";
+import { Calendar, Car, Loader2, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EventCard from "@/components/event-card";
 import { CATEGORIES } from "@/lib/data";
 import { ArrowRight } from "lucide-react";
+import { createLocationSlug } from "@/lib/location-utils";
 
 const ExplorePage = () => {
   const router = useRouter();
-  const { data: currentUser } = useConvexQuery(api.users.getCurrentUser);
+
   const plugin = useRef(Autoplay({ delay: 5000, stopOnInteraction: true }));
 
+  // Fetch users
+  const { data: currentUser } = useConvexQuery(api.users.getCurrentUser);
+
+  // Fetch  events
   const { data: featuredEvents, isLoading: loadingFeatured } = useConvexQuery(
     api.explore.getFeaturedEvents,
-    { limit: 3 }
+    { limit: 3 },
   );
+
+  // Fetch localEvents
 
   const { data: localEvents, isLoading: loadingLocal } = useConvexQuery(
     api.explore.getEventsByLocation,
@@ -40,15 +47,22 @@ const ExplorePage = () => {
       city: currentUser?.location?.city || "Gurugram",
       state: currentUser?.location?.state || "Haryana",
       limit: 4,
-    }
+    },
   );
 
   const { data: popularEvents, isLoading: loadingPopular } = useConvexQuery(
     api.explore.getPopularEvents,
-    { limit: 6 }
+    { limit: 6 },
   );
 
   const { data: categoryCounts } = useConvexQuery(api.explore.getCategoryCount);
+
+  const categoryWithCounts = CATEGORIES.map((cat) => {
+    return {
+      ...cat,
+      count: categoryCounts?.[cat.id] || 0,
+    };
+  });
 
   const handleEventClick = (slug) => {
     router.push(`/events/${slug}`);
@@ -161,10 +175,8 @@ const ExplorePage = () => {
             <CarouselPrevious className="left-4" />
             <CarouselNext className="right-4" />
           </Carousel>
-          
         </div>
       )}
-
       {/* Local Events */}
       {localEvents && localEvents.length > 0 && (
         <div className="mb-16">
@@ -196,7 +208,6 @@ const ExplorePage = () => {
           </div>
         </div>
       )}
-
       {/* Browse by Category */}
       <div className="mb-16">
         <h2 className="text-3xl font-bold mb-6">Browse by Category</h2>
@@ -223,12 +234,44 @@ const ExplorePage = () => {
           ))}
         </div>
       </div>
-
       {/* Popular Events Across Country */}
+      {popularEvents && popularEvents.length > 0 && (
+        <div className="mb-16">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold mb-1"> Popular Across India</h2>
+            <p className="text-muted-foreground">Trending events nationwide</p>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {popularEvents.map((event) => (
+              <EventCard
+                key={event._id}
+                event={event}
+                variant="list"
+                onClick={() => handleEventClick(event.slug)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
       {/* Empty State */}
+
+      {true && (
+        <Card className="p-12 text-center">
+          <div className="max-w-md mx-auto space-y-4">
+            <div className="text-6xl mb-4">🎉</div>
+            <h2 className="text-2xl font-bold">No events yet</h2>
+            <p className="text-muted-foreground">
+              Be the first to create an event in your area
+            </p>
+            <Button asChild className="gap-2">
+              <a href="/create-event">Create Event</a>
+            </Button>
+          </div>
+        </Card>
+      )}
     </>
   );
-};;
+};
 
 export default ExplorePage;

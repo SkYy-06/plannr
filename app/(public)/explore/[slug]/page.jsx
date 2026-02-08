@@ -1,9 +1,143 @@
-import React from 'react'
+"use client";
+
+import { useConvexQuery } from "@/hooks/use-convex-query";
+import { CATEGORIES } from "@/lib/data";
+import { parseLocationSlug } from "@/lib/location-utils";
+
+import { notFound, useParams, useRouter } from "next/navigation";
+
+import { api } from "@/convex/_generated/api";
+import React from "react";
+import EventCard from "@/components/event-card";
+import { Loader2 } from "lucide-react";
 
 const DynamicExplorePage = () => {
-  return (
-    <div>DynamicExplorePage</div>
-  )
-}
+  const params = useParams();
+  const router = useRouter();
+  const slug = params.slug;
 
-export default DynamicExplorePage
+  // Check if it's a valid category
+
+  const categoryInfo = CATEGORIES.find((cat) => cat.id === slug);
+  const isCategory = !!categoryInfo; //converts any value into a strict boolean
+
+  // If not category , validate location
+  const { city, state, isValid } = !isCategory
+    ? parseLocationSlug(slug)
+    : { city: null, state: null, isValid: false }; // check if slug != category parse it with location else if slug === cat skip parsing and assume valid
+
+  // If it's not a valid category and not a valid location , show 404
+
+  if (!isCategory && !isValid) {
+    notFound();
+  }
+
+  // fetching events by category and by location
+
+  const { data: events, isLoading } = useConvexQuery(
+    isCategory
+      ? api.explore.getEventsByCategory
+      : api.explore.getEventsByLocation,
+    isCategory
+      ? { category: slug, limit: 50 }
+      : city && state
+        ? { city, state, limit: 50 }
+        : "skip",
+  );
+
+  const handleEventClick = (eventSlug) => {
+    router.push(`/events/${eventSlug}`);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      </div>
+    );
+  }
+
+  if (isCategory) {
+    return (
+      <>
+        <div className="pb-5">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="text-6xl">{categoryInfo.icon}</div>
+            <div>
+              <h1 className="text-5xl md:text-6xl font-bold">
+                {categoryInfo.label}
+              </h1>
+              <p className="text-lg text-muted-foreground pt-1.5">
+                {categoryInfo.description}
+              </p>
+            </div>
+          </div>
+
+          {events && events.length > 0 && (
+            <p className="text-muted-foreground">
+              {events.length} event{events.length !== 1 ? "s" : ""} found
+            </p>
+          )}
+        </div>
+
+        {events && events.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {events.map((event) => (
+              <EventCard
+                key={event._id}
+                event={event}
+                onClick={() => handleEventClick(event.slug)}
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground">
+            No events found in this category.
+          </p>
+        )}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className="pb-5">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="text-6xl">📍</div>
+          <div>
+            <h1 className="text-5xl md:text-6xl font-bold">
+              Events in {city}
+            </h1>
+            <p className="text-lg text-muted-foreground">
+             {state}
+            </p>
+          </div>
+        </div>
+
+        {events && events.length > 0 && (
+          <p className="text-muted-foreground">
+            {events.length} event{events.length !== 1 ? "s" : ""} found
+          </p>
+        )}
+      </div>
+
+      {events && events.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {events.map((event) => (
+            <EventCard
+              key={event._id}
+              event={event}
+              onClick={() => handleEventClick(event.slug)}
+            />
+          ))}
+        </div>
+      ) : (
+        <p className="text-muted-foreground">
+          No events found in this category.
+        </p>
+      )}
+    </>
+  );
+};
+
+export default DynamicExplorePage;
