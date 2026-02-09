@@ -110,6 +110,7 @@ const ExplorePage = () => {
         <div className="mb-16">
           <Carousel
             className="w-full "
+            opts={{ loop: true }}
             plugins={[plugin.current]}
             onMouseEnter={plugin.current.stop}
             onMouseLeave={plugin.current.reset}

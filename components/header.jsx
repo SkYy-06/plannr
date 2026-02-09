@@ -9,7 +9,7 @@ import { BarLoader } from "react-spinners";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { useStoreUser } from "@/hooks/use-store-user";
 import { Building, Plus, Ticket } from "lucide-react";
-import { OnboardingModal } from "./onboarding-modal";
+import OnboardingModal from "./onboarding-modal";
 import { useOnboarding } from "@/hooks/use-onboarding";
 
 const Header = () => {
@@ -17,7 +17,7 @@ const Header = () => {
 
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
-  const { showOnboarding, handleOnboardingComplete, handleOnboardingSkip } =
+  const { showOnboarding, handleOnboardingComplete, handleOnboardingSkip , setShowOnboarding } =
     useOnboarding();
 
   return (
@@ -100,7 +100,8 @@ const Header = () => {
       {/* Modals */}
       <OnboardingModal
         isOpen={showOnboarding}
-        onClose={handleOnboardingSkip}
+        
+        onClose= {() => setShowOnboarding(false)}
         onComplete={handleOnboardingComplete}
       />
     </>

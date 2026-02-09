@@ -20,7 +20,7 @@ export default defineSchema({
         country: v.string(),
       })
     ),
-    interest: v.optional(v.array(v.string())), // Min 3 Categories
+    interests: v.optional(v.array(v.string())), // Min 3 Categories
 
     // Organizer tracking (User Subscription)
 
