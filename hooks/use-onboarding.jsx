@@ -10,7 +10,6 @@ const ATTENDEE_PAGES = ["/explore", "/events", "/my-tickets", "/profile"];
 
 export function useOnboarding() {
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [hasManuallyDismissed, setHasManuallyDismissed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -19,7 +18,7 @@ export function useOnboarding() {
   );
 
   useEffect(() => {
-    if (isLoading || !currentUser || hasManuallyDismissed) return;
+    if (isLoading || !currentUser) return;
 
     // Check if user hasn't completed onboarding
     if (!currentUser.hasCompletedOnboarding) {
@@ -31,11 +30,9 @@ export function useOnboarding() {
       if (requiresOnboarding) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setShowOnboarding(true);
-      } else {
-        setShowOnboarding(false);
       }
     }
-  }, [currentUser, pathname, isLoading, hasManuallyDismissed]);
+  }, [currentUser, pathname, isLoading]);
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
@@ -43,13 +40,8 @@ export function useOnboarding() {
     router.refresh();
   };
 
-  // const handleOnboardingClose = () => {
-  //   setShowOnboarding(false);
-  // };
-
   const handleOnboardingSkip = () => {
     setShowOnboarding(false);
-     setHasManuallyDismissed(true);
     // Redirect back to homepage if they skip
     router.push("/");
   };
@@ -59,7 +51,6 @@ export function useOnboarding() {
     setShowOnboarding,
     handleOnboardingComplete,
     handleOnboardingSkip,
- 
     needsOnboarding: currentUser && !currentUser.hasCompletedOnboarding,
   };
 }

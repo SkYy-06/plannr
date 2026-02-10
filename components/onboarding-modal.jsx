@@ -86,11 +86,8 @@ export default function OnboardingModal({ isOpen, onClose, onComplete }) {
         },
         interests: selectedInterests,
       });
-      
       toast.success("Welcome to Plannr! 🎉");
-      await onComplete();
-      onClose();
-      
+      onComplete();
     } catch (error) {
       toast.error("Failed to complete onboarding");
       console.error(error);
@@ -130,7 +127,7 @@ export default function OnboardingModal({ isOpen, onClose, onComplete }) {
           {/* Step 1: Select Interests */}
           {step === 1 && (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-100 overflow-y-auto p-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[400px] overflow-y-auto p-2">
                 {CATEGORIES.map((category) => (
                   <button
                     key={category.id}

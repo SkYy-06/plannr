@@ -11,7 +11,7 @@ export default defineSchema({
     imageUrl: v.optional(v.string()),
 
     // Onboarding
-    hasCompleteOnboarding: v.boolean(),
+    hasCompletedOnboarding: v.boolean(),
 
     location: v.optional(
       v.object({

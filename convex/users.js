@@ -38,7 +38,7 @@ export const store = mutation({
       tokenIdentifier: identity.tokenIdentifier,
       email: identity.email ?? "",
       imageUrl: identity.pictureUrl,
-      hasCompleteOnboarding: false,
+      hasCompletedOnboarding: false,
       freeEventsCreated: 0,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -81,7 +81,7 @@ export const completeOnboarding = mutation({
     await ctx.db.patch(user._id, {
       location: args.location,
       interests: args.interests,
-      hasCompleteOnboarding: true,
+      hasCompletedOnboarding: true,
       updatedAt: Date.now(),
     });
 
