@@ -3,23 +3,32 @@
 import Image from "next/image";
 import React, { useState } from "react";
 import Link from "next/link";
-import { UserButton, SignInButton } from "@clerk/nextjs";
+import { UserButton, SignInButton, useAuth } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import { BarLoader } from "react-spinners";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { useStoreUser } from "@/hooks/use-store-user";
-import { Building, Plus, Ticket } from "lucide-react";
+import { Building, Crown, Plus, Ticket } from "lucide-react";
 import OnboardingModal from "./onboarding-modal";
 import { useOnboarding } from "@/hooks/use-onboarding";
 import SearchLocationBar from "./search-location-bar";
+import { Badge } from "./ui/badge";
+import UpgradeModal from "./upgrade-modal";
 
 const Header = () => {
   const { isLoading } = useStoreUser();
 
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
-  const { showOnboarding, handleOnboardingComplete, handleOnboardingSkip , setShowOnboarding } =
-    useOnboarding();
+  const {
+    showOnboarding,
+    handleOnboardingComplete,
+    handleOnboardingSkip,
+    setShowOnboarding,
+  } = useOnboarding();
+
+  const { has } = useAuth();
+  const hasPro = has?.({ plan: "pro" });
 
   return (
     <>
@@ -35,6 +44,15 @@ const Header = () => {
               className="w-full h-16"
               priority
             />
+
+            {/* Pro Badge */}
+
+            {hasPro && (
+              <Badge className="bg-linear-to-r from-pink-500 to-orange-500 gap-1 text-white ml-3">
+                <Crown className="w-3 h-3" />
+                Pro
+              </Badge>
+            )}
           </Link>
 
           {/* Search & Location - Desktop Only */}
@@ -48,13 +66,13 @@ const Header = () => {
           <div className="flex items-center">
             {/* Show Pro badge or Upgrade button */}
 
-            <Button
+           {!hasPro && ( <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowUpgradeModal(true)}
             >
               Pricing
-            </Button>
+            </Button>)}
 
             <Button variant="ghost" size="sm" asChild className={"mr-2"}>
               <Link href="/explore">Explore</Link>
@@ -112,6 +130,14 @@ const Header = () => {
         onClose={handleOnboardingSkip}
         onComplete={handleOnboardingComplete}
       />
+
+
+<UpgradeModal 
+isOpen = {showUpgradeModal}
+onClose = {() => setShowUpgradeModal(false)}
+trigger = "header"
+/>
+
     </>
   );
 };

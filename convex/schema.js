@@ -77,7 +77,7 @@ export default defineSchema({
     .index("by_slug", ["slug"])
     .searchIndex("search_title", { searchField: "title" }),
 
-  registerations: defineTable({
+  registrations: defineTable({
     eventId: v.id("events"),
     userId: v.id("users"),
 
